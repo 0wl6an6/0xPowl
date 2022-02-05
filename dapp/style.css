@@ -6,8 +6,6 @@ body {
   background: -moz-linear-gradient(180deg, rgba(94,209,225,1) 0%, rgba(191,194,254,1) 47%, rgba(232,189,219,1) 100%);
   background: -webkit-linear-gradient(180deg, rgba(94,209,225,1) 0%, rgba(191,194,254,1) 47%, rgba(232,189,219,1) 100%);
   background: linear-gradient(180deg, rgba(94,209,225,1) 0%, rgba(191,194,254,1) 47%, rgba(232,189,219,1) 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#5ed1e1",endColorstr="#e8bddb",GradientType=1);
-  /* letter-spacing: 2px; */
 }
 
 .form-range {

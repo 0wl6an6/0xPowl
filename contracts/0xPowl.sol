@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract OxPowl is ERC1155, Ownable, ReentrancyGuard { 
+contract OxPowl is ERC1155, Ownable, ReentrancyGuard { // Contract address - Mainnet Polygon : 0x751497a863f606EAFCd63418b920Ad98f5d7f972
 
   string  public name = "0xPowl";
   string  public symbol = "POWL";

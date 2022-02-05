@@ -14,8 +14,29 @@ window.addEventListener('load', async ()=>{
   // Amount and price display
   dispAmountDiv.innerHTML = amount.value < 10 ? `0${amount.value}` : amount.value; 
   cost.innerHTML = `Ξ${(amount.value*0.005).toFixed(3)}`;
-  // Minted amount
-  updateMinted();
+  // Detect the provider (window.ethereum)
+  if (window.ethereum === undefined) {
+    alert('Please install Metamask.', 'info');
+  } else {
+    // Detect which network the user is connected to
+    const chainId = await ethereum.request({ method: 'eth_chainId' });
+    if (chainId !== '0x13881') {
+      loadingPanelShow(true);
+      // ask to change to if not on correct one
+      try {
+        await changeNetworks();
+        loadingPanelShow(false);
+      } catch(err) {
+        // if don't exist ask to add network to metamask
+        if (err.code === 4902) {
+          try {
+            await addNetwork();
+            loadingPanelShow(false);
+          } catch (err) { window.location.reload(); }
+        } else { window.location.reload(); }
+      }
+    }
+  }
 });
 
 amount.addEventListener('input', (e) => {
@@ -30,10 +51,9 @@ let updateMinted = async () => {
 } 
 
 // Alerts popup handle
-var alertPlaceholder = document.querySelector('.alertPlaceholder');
 let alert = (message, type) => {
-  alertPlaceholder.innerHTML = '';
-  alertPlaceholder.insertAdjacentHTML('beforeend', '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+  document.querySelector('.alertPlaceholder').innerHTML = '';
+  document.querySelector('.alertPlaceholder').insertAdjacentHTML('beforeend', '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
 }
 
 // blocking loading panel.
@@ -42,77 +62,70 @@ let loadingPanelShow = (state) => {
   document.querySelector("#mintbbtn").style.pointerEvents = state ? 'none' : 'auto';
 }
 
+let changeNetworks = async () => {
+  await ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: '0x13881' }],
+  });
+}
+
+let addNetwork = async () => {
+  await ethereum.request({
+    method: 'wallet_addEthereumChain',
+    params: [
+      {
+        chainId: '0x13881',
+        chainName: 'Polygon Mumbai testnet',
+        rpcUrls: [
+          "https://rpc-mumbai.matic.today",
+          "https://matic-mumbai.chainstacklabs.com",
+          "https://rpc-mumbai.maticvigil.com",
+          "https://matic-testnet-archive-rpc.bwarelabs.c"
+        ],
+        blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+        nativeCurrency: {
+          name: "MATIC",
+          symbol: "MATIC",
+          decimals: 18,
+        }
+      }],
+  });
+}
+
 // Web3 and Metmask
 let mint = async () => { 
-  let mintCost = 5000000000000000; // wei => 0.005 WETH
-  // Detect the provider (window.ethereum)
-  if (window.ethereum === undefined) {
-    alert('Please install Metamask.', 'info');
-  } else {
-    // Detect which network the user is connected to
-    const chainId = await ethereum.request({ method: 'eth_chainId' });
-    if (chainId !== '0x13881') {
-      // ask to change to if not on correct one
-      try {
-        await ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x13881' }],
-        })
-      } catch(err) {
-        // if don't exist ask to add network to metamask
-        if (err.code === 4902) {
-          try {
-            await ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: '0x13881',
-                  chainName: 'Polygon Mumbai testnet',
-                  rpcUrls: [
-                    "https://rpc-mumbai.matic.today",
-                    "https://matic-mumbai.chainstacklabs.com",
-                    "https://rpc-mumbai.maticvigil.com",
-                    "https://matic-testnet-archive-rpc.bwarelabs.c"
-                  ],
-                  blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
-                  nativeCurrency: {
-                    name: "MATIC",
-                    symbol: "MATIC",
-                    decimals: 18,
-                  }
-                }],
-            });
-          } catch (err) { alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); return; }
-        } else { window.location.reload(); }
-      }
-    }
-    // Start loading and btn disable
+  if (ethereum.chainId !== '0x13881') {
     loadingPanelShow(true);
-    try { // Get the user's account(s)
-      await ethereum.request({ method: 'eth_requestAccounts' });
-      try { // request allowance for amount in WETH contract
-        let approve = await wethContract.methods.approve("0xB3E8BF31Da5585e50640A2157d4986d964726e92", (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
+    await changeNetworks();
+    loadingPanelShow(false);
+  }
+  let mintCost = 5000000000000000; // wei => 0.005 WETH
+  // Start loading and btn disable
+  loadingPanelShow(true);
+  try { // Get the user's account(s)
+    await ethereum.request({ method: 'eth_requestAccounts' });
+    try { // request allowance for amount in WETH contract
+      let approve = await wethContract.methods.approve("0xB3E8BF31Da5585e50640A2157d4986d964726e92", (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
+      // cast transaction hash and gas
+      txData.insertAdjacentHTML('beforeend', 
+        `<div class='Tx'>Approve Tx: <a target='_blank' href='${txBaseUri}${approve.transactionHash}'>${`${approve.transactionHash.slice(0,4)}...${approve.transactionHash.slice(-4)}`}</a>, Gas Used: ${approve.gasUsed}</div>`
+      );
+      try { // Call mint function
+        let mint = await powlContract.methods.mint(parseInt(document.getElementById('amount').value)).send({from: ethereum.selectedAddress});
         // cast transaction hash and gas
         txData.insertAdjacentHTML('beforeend', 
-          `<div class='Tx'>Approve Tx: <a target='_blank' href='${txBaseUri}${approve.transactionHash}'>${`${approve.transactionHash.slice(0,4)}...${approve.transactionHash.slice(-4)}`}</a>, Gas Used: ${approve.gasUsed}</div>`
+          `<div class='Tx'>Mint Tx: <a target='_blank' href='${txBaseUri}${mint.transactionHash}'>${`${mint.transactionHash.slice(0,4)}...${mint.transactionHash.slice(-4)}`}</a>, Gas Used: ${mint.gasUsed}</div>`
+        );          
+        txData.insertAdjacentHTML('beforeend', 
+        `<div class='msg'>Thank you! Welcome to the club. Hoot hoot!</div>`
         );
-        try { // Call mint function
-          let mint = await powlContract.methods.mint(parseInt(document.getElementById('amount').value)).send({from: ethereum.selectedAddress});
-          // cast transaction hash and gas
-          txData.insertAdjacentHTML('beforeend', 
-            `<div class='Tx'>Mint Tx: <a target='_blank' href='${txBaseUri}${mint.transactionHash}'>${`${mint.transactionHash.slice(0,4)}...${mint.transactionHash.slice(-4)}`}</a>, Gas Used: ${mint.gasUsed}</div>`
-          );          
-          txData.insertAdjacentHTML('beforeend', 
-          `<div class='msg'>Thank you! Welcome to the club. Hoot hoot!</div>`
-          );
-          // Update minted
-          updateMinted();
-          // Stop loading and btn disable
-          loadingPanelShow(false);
-        } catch(err) {alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); loadingPanelShow(false); return; };
+        // Update minted
+        updateMinted();
+        // Stop loading and btn disable
+        loadingPanelShow(false);
       } catch(err) {alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); loadingPanelShow(false); return; };
     } catch(err) {alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); loadingPanelShow(false); return; };
-  }
+  } catch(err) {alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); loadingPanelShow(false); return; };
 }
 
 ethereum.on('chainChanged', (_chainId) => { if (_chainId !== '0x13881') {window.location.reload(); }});
