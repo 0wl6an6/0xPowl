@@ -7,5 +7,5 @@ Clicking on the mint button will preform the following:
 3. Ask allowance for minting cost in WETH contract. **_(requires wallet signature)_**
 4. Mint requested amount. **_(requires wallet signature)_**
 
-Tx hashes will display once confirmation is received.
+Tx hashes will be displayed once confirmation is received.
 
