@@ -1,0 +1,1 @@
+![DApp front page preview](./dapp/dappreview.png "DApp front page preview")
