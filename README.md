@@ -2,8 +2,8 @@
 
 # Mint button.
 Clicking on the mint button will preform the following: 
-1. Check to see if Metmask is installed. (requires wallet signature)
-2. Check for network and ask to change / add if don't exist. (requires wallet signature)
-3. Ask allowance for cost amount needed from WETH contract. (requires wallet signature)
-4. Mint amount requested. (requires wallet signature)
+1. Check to see if Metmask is installed. **_(requires wallet signature)_**
+2. Check for network and ask to change / add if don't exist. **_(requires wallet signature)_**
+3. Ask allowance for cost amount needed from WETH contract. **_(requires wallet signature)_**
+4. Mint amount requested. **_(requires wallet signature)_**
 
