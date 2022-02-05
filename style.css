@@ -1,0 +1,61 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css");
+
+body {
+  padding: 0; margin: 0; width: 100vw; height: 100vh;
+  background: rgb(94,209,225);
+  background: -moz-linear-gradient(180deg, rgba(94,209,225,1) 0%, rgba(191,194,254,1) 47%, rgba(232,189,219,1) 100%);
+  background: -webkit-linear-gradient(180deg, rgba(94,209,225,1) 0%, rgba(191,194,254,1) 47%, rgba(232,189,219,1) 100%);
+  background: linear-gradient(180deg, rgba(94,209,225,1) 0%, rgba(191,194,254,1) 47%, rgba(232,189,219,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#5ed1e1",endColorstr="#e8bddb",GradientType=1);
+  /* letter-spacing: 2px; */
+}
+
+.form-range {
+  width: auto !important;
+}
+
+.bi {
+  font-size: 28px;
+}
+
+.flipletter {
+  display: inline-block;
+  -moz-transform: scale(-1, 1);
+  -webkit-transform: scale(-1, 1);
+  -o-transform: scale(-1, 1);
+  -ms-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+}
+
+img#PImg {
+  border-radius: 50%;
+  border: 10px solid rgba(0,0,0,0.1);
+  opacity: 0.5;
+}
+
+.stats  {
+  display: inline-block;
+}
+
+#txData {
+  font-size: 12px;
+}
+
+#mintbbtn, #syncbtn {cursor:pointer;}
+
+#loadingBlock {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-border {
+  width: 100px; height: 100px; display: list-item !important; position: relative;
+}
