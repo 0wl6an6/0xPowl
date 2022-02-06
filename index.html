@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <link rel="stylesheet" href="./dapp/style.css">
+  <link rel="stylesheet" href="./src/style.css">
 
   <script src="./node_modules/web3/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -23,12 +23,13 @@
 
     <p class='mt-3'>10K 0x<span class='flipletter'>P</span>owls living on the 0x<span class='flipletter'>P</span>owligon network.</p>
 		
+    <div id="userpanel" class="text-muted fs-6 m-3"></div>
 
 		<div class="row">
 			<div class="mb-3">
 				<label for="amount" class="form-label visually-hidden">Amount</label>
 				<small id='dispAmount'></small>
-				<input type="range" class="form-range pt-3" min="1" max="25" step="1" id="amount" width='100'>
+				<input type="range" class="form-range pt-3" min="1" max="25" step="1" id="amount" width='100' value="10">
 				<small id='cost'></small>
 				<a onclick="mint()" class='link-primary' id='mintbbtn'>Mint</a>
         <i class='bi bi-wallet2 fs-6'></i>
@@ -51,7 +52,6 @@
 				<br>
 				<a aria-label="Opensea" rel="noopener noreferrer" target='_blank' href="https://opensea.io/collection/0xpowl">Opensea</a>
         <br>
-		    <!-- <img alt='matic logo' src='./assets/maticlogo.png' width='20' class='mb-2'/> -->
 			</div>
     </div>
 
@@ -62,6 +62,7 @@
     <p class="text-white lead fw-bolder">Loading...</p>
   </div>
 
-  <script src="./dapp/main.js"></script>
+  <script src="./src/abis.js"></script>
+  <script src="./src/main.js"></script>
 </body>
 </html>
