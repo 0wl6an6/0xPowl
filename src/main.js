@@ -1,8 +1,17 @@
+// Load Contracts
+let polygonConnect = new Web3('https://polygon-rpc.com/'); // To pull data without relaying on the network the users wallet is connected
+let metamaskConnect = new Web3(window.ethereum); // connect through metmask provider for sending transactions
+let wethAddress = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619';
+let powlAddress = '0x751497a863f606EAFCd63418b920Ad98f5d7f972';
+let wethContract = new metamaskConnect.eth.Contract(JSON.parse(wethAbi), wethAddress);
+let powlContract = new metamaskConnect.eth.Contract(JSON.parse(powlAbi), powlAddress);
+let pc = new polygonConnect.eth.Contract(JSON.parse(powlAbi), powlAddress);
+
 let dispAmountDiv = document.getElementById('dispAmount');
 let costDiv = document.getElementById('cost');
 let amountRangeVal = document.getElementById('amount');
 let txData = document.getElementById('txData');
-let txBaseUri = 'https://mumbai.polygonscan.com/tx/';
+let txBaseUri = 'https://polygonscan.com/tx/';
 
 // Initiate dapp
 window.addEventListener('load', async ()=>{
@@ -22,7 +31,7 @@ window.addEventListener('load', async ()=>{
   } else {
     // Detect which network the user is connected to
     const chainId = await ethereum.request({ method: 'eth_chainId' });
-    if (chainId !== '0x13881') {
+    if (chainId !== '0x89') {
       loadingPanelShow(true);
       // ask to change to if not on correct one
       try {
@@ -48,8 +57,8 @@ amount.addEventListener('input', (e) => {
 
 // update user panel if wallet's connected.
 let updateUserPanel = async () => {
+  document.querySelector('#userpanel').innerHTML = '';
   if (ethereum.selectedAddress) {
-    document.querySelector('#userpanel').innerHTML = '';
     document.querySelector('#userpanel').innerHTML = `Connected with ${ethereum.selectedAddress.slice(0,4)}...${ethereum.selectedAddress.slice(-4)}`;
   }
 }
@@ -60,7 +69,7 @@ ethereum.on('accountsChanged', ()=> { updateUserPanel(); });
 
 // Update minted amount
 let updateMinted = async () => {
-  let minted = await powlData.methods.minted().call();
+  let minted = await pc.methods.minted().call();
   document.querySelector('#mintamount').innerHTML = '';
   document.querySelector('#mintamount').innerHTML = minted;
 } 
@@ -81,7 +90,7 @@ let loadingPanelShow = (state) => {
 let changeNetworks = async () => {
   await ethereum.request({
     method: 'wallet_switchEthereumChain',
-    params: [{ chainId: '0x13881' }],
+    params: [{ chainId: '0x89' }],
   });
 }
 
@@ -90,15 +99,17 @@ let addNetwork = async () => {
     method: 'wallet_addEthereumChain',
     params: [
       {
-        chainId: '0x13881',
-        chainName: 'Polygon Mumbai testnet',
+        chainId: '0x89',
+        chainName: 'Polygon Mainnet',
         rpcUrls: [
-          "https://rpc-mumbai.matic.today",
-          "https://matic-mumbai.chainstacklabs.com",
-          "https://rpc-mumbai.maticvigil.com",
-          "https://matic-testnet-archive-rpc.bwarelabs.c"
+          "https://polygon-rpc.com/",
+          "https://rpc-mainnet.matic.network",
+          "https://matic-mainnet.chainstacklabs.com",
+          "https://rpc-mainnet.maticvigil.com",
+          "https://rpc-mainnet.matic.quiknode.pro",
+          "https://matic-mainnet-full-rpc.bwarelabs.com"
         ],
-        blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+        blockExplorerUrls: ['https://polygonscan.com/'],
         nativeCurrency: {
           name: "MATIC",
           symbol: "MATIC",
@@ -108,11 +119,11 @@ let addNetwork = async () => {
   });
 }
 
-ethereum.on('chainChanged', (_chainId) => { if (_chainId !== '0x13881') {window.location.reload(); }});
+ethereum.on('chainChanged', (_chainId) => { if (_chainId !== '0x89') {window.location.reload(); }});
 
 // Mint function
 let mint = async () => { 
-  if (ethereum.chainId !== '0x13881') {
+  if (ethereum.chainId !== '0x89') {
     loadingPanelShow(true);
     await changeNetworks();
     loadingPanelShow(false);
@@ -123,7 +134,7 @@ let mint = async () => {
   try { // Get the user's account(s)
     await ethereum.request({ method: 'eth_requestAccounts' });
     try { // request allowance for amount in WETH contract
-      let approve = await wethContract.methods.approve("0x751497a863f606EAFCd63418b920Ad98f5d7f972", (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
+      let approve = await wethContract.methods.approve(powlAddress, (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
       // cast transaction hash and gas
       txData.insertAdjacentHTML('beforeend', 
         `<div class='Tx'>Approve Tx: <a target='_blank' href='${txBaseUri}${approve.transactionHash}'>${`${approve.transactionHash.slice(0,4)}...${approve.transactionHash.slice(-4)}`}</a>, Gas Used: ${approve.gasUsed}</div>`
@@ -145,14 +156,3 @@ let mint = async () => {
     } catch(err) {alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); loadingPanelShow(false); return; };
   } catch(err) {alert(`Code: ${err.code} Msg: ${err.message}`, 'warning'); loadingPanelShow(false); return; };
 }
-
-
-let metaMaskConnect = new Web3(window.ethereum); // injected in html > head
-let polygonConnect = new Web3('https://polygon-rpc.com');
-let wethContract = new metaMaskConnect.eth.Contract(JSON.parse(wethAbi), '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619');
-let powlContract = new metaMaskConnect.eth.Contract(JSON.parse(powlAbi), '0x751497a863f606EAFCd63418b920Ad98f5d7f972');
-
-// simultanious connection to pool data from contract without 
-// being depended on the connected network of the users wallet.
-// @TODO: Optimize
-let powlData = new polygonConnect.eth.Contract(JSON.parse(powlAbi), '0x751497a863f606EAFCd63418b920Ad98f5d7f972');
