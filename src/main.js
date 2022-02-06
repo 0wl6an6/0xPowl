@@ -12,6 +12,7 @@ let costDiv = document.getElementById('cost');
 let amountRangeVal = document.getElementById('amount');
 let txData = document.getElementById('txData');
 let txBaseUri = 'https://polygonscan.com/tx/';
+let mintCost = 0.005;
 
 // Initiate dapp
 window.addEventListener('load', async ()=>{
@@ -22,7 +23,7 @@ window.addEventListener('load', async ()=>{
   }, 2000);
   // Amount and price display
   dispAmountDiv.innerHTML = amount.value < 10 ? `0${amount.value}` : amount.value; 
-  cost.innerHTML = `Ξ${(amount.value*0.005).toFixed(3)}`;
+  cost.innerHTML = `Ξ${(amount.value*mintCost).toFixed(3)}`;
   // Update minted
   updateMinted();
   // Detect the provider (window.ethereum)
@@ -52,14 +53,17 @@ window.addEventListener('load', async ()=>{
 
 amount.addEventListener('input', (e) => {
   dispAmountDiv.innerHTML = amount.value < 10 ? `0${amount.value}` : amount.value; 
-  cost.innerHTML = `Ξ${(amount.value*0.005).toFixed(3)}`;
+  cost.innerHTML = `Ξ${(amount.value*mintCost).toFixed(3)}`;
 });
 
 // update user panel if wallet's connected.
 let updateUserPanel = async () => {
   document.querySelector('#userpanel').innerHTML = '';
   if (ethereum.selectedAddress) {
-    document.querySelector('#userpanel').innerHTML = `Connected with ${ethereum.selectedAddress.slice(0,4)}...${ethereum.selectedAddress.slice(-4)}`;
+    let balance = await wethContract.methods.balanceOf(ethereum.selectedAddress).call();
+    let balanceDisp = parseFloat(metamaskConnect.utils.fromWei(balance)).toFixed(8);
+    let color = balanceDisp > document.querySelector('#amount').value*mintCost ? 'success' : 'danger';
+    document.querySelector('#userpanel').innerHTML = `Connected with ${ethereum.selectedAddress.slice(0,4)}...${ethereum.selectedAddress.slice(-4)}. Balance: <span class='text-${color}'>Ξ${balanceDisp}</span>`;
   }
 }
 
@@ -128,13 +132,12 @@ let mint = async () => {
     await changeNetworks();
     loadingPanelShow(false);
   }
-  let mintCost = 5000000000000000; // wei => 0.005 WETH
   // Start loading and btn disable
   loadingPanelShow(true);
   try { // Get the user's account(s)
     await ethereum.request({ method: 'eth_requestAccounts' });
     try { // request allowance for amount in WETH contract
-      let approve = await wethContract.methods.approve(powlAddress, (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
+      let approve = await wethContract.methods.approve(powlAddress, (document.getElementById('amount').value*metamaskConnect.utils.toWei(mintCost.toString())).toString()).send({from: ethereum.selectedAddress});
       // cast transaction hash and gas
       txData.insertAdjacentHTML('beforeend', 
         `<div class='Tx'>Approve Tx: <a target='_blank' href='${txBaseUri}${approve.transactionHash}'>${`${approve.transactionHash.slice(0,4)}...${approve.transactionHash.slice(-4)}`}</a>, Gas Used: ${approve.gasUsed}</div>`
