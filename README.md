@@ -1,4 +1,4 @@
-![DApp front page preview](./src/dappreview.png "DApp front page preview")
+![DApp front page preview](./public/src/dappreview.png "DApp front page preview")
 
 # Mint button.
 Clicking on the mint button will preform the following: 
