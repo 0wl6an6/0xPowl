@@ -148,12 +148,11 @@ let mint = async () => {
 
 
 let metaMaskConnect = new Web3(window.ethereum); // injected in html > head
-let polygonConnect = new Web3('https://rpc-mumbai.matic.today');
+let polygonConnect = new Web3('https://polygon-rpc.com');
 let wethContract = new metaMaskConnect.eth.Contract(JSON.parse(wethAbi), '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619');
 let powlContract = new metaMaskConnect.eth.Contract(JSON.parse(powlAbi), '0x751497a863f606EAFCd63418b920Ad98f5d7f972');
 
 // simultanious connection to pool data from contract without 
 // being depended on the connected network of the users wallet.
 // @TODO: Optimize
-// let polygonConnect = new Web3('https://polygon-rpc.com');
 let powlData = new polygonConnect.eth.Contract(JSON.parse(powlAbi), '0x751497a863f606EAFCd63418b920Ad98f5d7f972');
