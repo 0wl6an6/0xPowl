@@ -123,7 +123,7 @@ let mint = async () => {
   try { // Get the user's account(s)
     await ethereum.request({ method: 'eth_requestAccounts' });
     try { // request allowance for amount in WETH contract
-      let approve = await wethContract.methods.approve("0xB3E8BF31Da5585e50640A2157d4986d964726e92", (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
+      let approve = await wethContract.methods.approve("0x751497a863f606EAFCd63418b920Ad98f5d7f972", (document.getElementById('amount').value*mintCost).toString()).send({from: ethereum.selectedAddress});
       // cast transaction hash and gas
       txData.insertAdjacentHTML('beforeend', 
         `<div class='Tx'>Approve Tx: <a target='_blank' href='${txBaseUri}${approve.transactionHash}'>${`${approve.transactionHash.slice(0,4)}...${approve.transactionHash.slice(-4)}`}</a>, Gas Used: ${approve.gasUsed}</div>`
@@ -149,11 +149,11 @@ let mint = async () => {
 
 let metaMaskConnect = new Web3(window.ethereum); // injected in html > head
 let polygonConnect = new Web3('https://rpc-mumbai.matic.today');
-let wethContract = new metaMaskConnect.eth.Contract(JSON.parse(wethAbi), '0x326C977E6efc84E512bB9C30f76E30c160eD06FB');
-let powlContract = new metaMaskConnect.eth.Contract(JSON.parse(powlAbi), '0xB3E8BF31Da5585e50640A2157d4986d964726e92');
+let wethContract = new metaMaskConnect.eth.Contract(JSON.parse(wethAbi), '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619');
+let powlContract = new metaMaskConnect.eth.Contract(JSON.parse(powlAbi), '0x751497a863f606EAFCd63418b920Ad98f5d7f972');
 
 // simultanious connection to pool data from contract without 
 // being depended on the connected network of the users wallet.
 // @TODO: Optimize
 // let polygonConnect = new Web3('https://polygon-rpc.com');
-let powlData = new polygonConnect.eth.Contract(JSON.parse(powlAbi), '0xB3E8BF31Da5585e50640A2157d4986d964726e92');
+let powlData = new polygonConnect.eth.Contract(JSON.parse(powlAbi), '0x751497a863f606EAFCd63418b920Ad98f5d7f972');
