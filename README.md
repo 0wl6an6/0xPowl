@@ -8,5 +8,6 @@ Clicking on the mint button will preform the following:
 4. Mint requested amount. **_(requires wallet signature)_**
 
 *Tx hashes will be displayed once confirmation is received.
+WELCOME TO THE CLUB!
 
 Contract - Mainnet Polygon : [0x751497a863f606EAFCd63418b920Ad98f5d7f972](https://polygonscan.com/address/0x751497a863f606eafcd63418b920ad98f5d7f972)
