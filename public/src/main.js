@@ -7,10 +7,10 @@ let wethContract = new metamaskConnect.eth.Contract(JSON.parse(wethAbi), wethAdd
 let powlContract = new metamaskConnect.eth.Contract(JSON.parse(powlAbi), powlAddress);
 let pc = new polygonConnect.eth.Contract(JSON.parse(powlAbi), powlAddress);
 
-let dispAmountDiv = document.getElementById('dispAmount');
-let costDiv = document.getElementById('cost');
-let amountRangeVal = document.getElementById('amount');
-let txData = document.getElementById('txData');
+let dispAmountDiv = document.querySelector('#dispAmount');
+let costDiv = document.querySelector('#cost');
+let amount = document.querySelector('#amount');
+let txData = document.querySelector('#txData');
 let txBaseUri = 'https://polygonscan.com/tx/';
 let mintCost = 0.005;
 
@@ -55,6 +55,12 @@ amount.addEventListener('input', (e) => {
   dispAmountDiv.innerHTML = amount.value < 10 ? `0${amount.value}` : amount.value; 
   cost.innerHTML = `Ξ${(amount.value*mintCost).toFixed(3)}`;
 });
+
+amount.addEventListener('change', (e) => {
+  updateUserPanel();
+});
+
+
 
 // update user panel if wallet's connected.
 let updateUserPanel = async () => {
